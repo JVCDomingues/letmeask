@@ -24,10 +24,10 @@ type RoomParams = {
 function AdminRoom() {
   // const { user } = useAuth();
   const { id } = useParams<RoomParams>();
-  const { questions, title } = useRoom(id);
+  const { questions, title, endedAt } = useRoom(id);
   const history = useHistory();
 
-  async function handleEndRoom() {
+  async function handleEndRoom() {   
     await database.ref(`/rooms/${id}`).update({
       endedAt: new Date(),
     });
@@ -60,53 +60,65 @@ function AdminRoom() {
           <img src={logo} alt="Letmeask" />
           <div>
             <RoomCode code={id}/>
-            <Button isOutlined onClick={handleEndRoom}>Encerrar sala</Button>
+            {!endedAt ? (
+              <Button isOutlined onClick={handleEndRoom}>Encerrar sala</Button>
+            ) : (
+              <Button isOutlined onClick={handleEndRoom} disabled>Sala encerrada!</Button>
+            )}
           </div>
         </div>
       </header>
 
       <main>
-        <div className="room-title">
-          <h1>Sala {title}</h1>
-          {questions.length > 0 && (
-            <span>{questions.length} pergunta(s)</span>
-          )}
-        </div>
+        {!endedAt ? (
+        <>
+          <div className="room-title">
+            <h1>Sala {title}</h1>
+            {questions.length > 0 && (
+              <span>{questions.length} pergunta(s)</span>
+            )}
+          </div>
 
-        <div className="question-list">
-          {questions.map(question => (
-            <Question 
-              key={question.id} 
-              content={question.content} 
-              author={question.author}
-              isAnswered={question.isAnswered}
-              isHighlighted={question.isHighlighted}
-            >
-              {!question.isAnswered && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => handleCheckQuestionAsAnswered(question.id)}
-                  >
-                   <img src={checkImg} alt="Marcar pergunta como respondida" />
-                 </button>
-                  <button
-                    type="button"
-                    onClick={() => handleHighlightQuestion(question.id)}
-                  >
-                    <img src={answerImg} alt="Dar destaque a pergunta" />
-                  </button>
-                 </>
-              )}
-              <button
-                type="button"
-                onClick={() => handleDeleteQuestion(question.id)}
+          <div className="question-list">
+            {questions.map(question => (
+              <Question 
+                key={question.id} 
+                content={question.content} 
+                author={question.author}
+                isAnswered={question.isAnswered}
+                isHighlighted={question.isHighlighted}
               >
-                <img src={deleteImg} alt="Remover pergunta" />
-              </button>
-            </Question>
-          ))}
-        </div>
+                {!question.isAnswered && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleCheckQuestionAsAnswered(question.id)}
+                    >
+                    <img src={checkImg} alt="Marcar pergunta como respondida" />
+                  </button>
+                    <button
+                      type="button"
+                      onClick={() => handleHighlightQuestion(question.id)}
+                    >
+                      <img src={answerImg} alt="Dar destaque a pergunta" />
+                    </button>
+                  </>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleDeleteQuestion(question.id)}
+                >
+                  <img src={deleteImg} alt="Remover pergunta" />
+                </button>
+              </Question>
+            ))}
+          </div>
+        </>
+        ) : (
+          <div className="room-title">
+            <h1>A sala já foi encerrada</h1>
+          </div>
+        )}
       </main>
     </div>
   )
