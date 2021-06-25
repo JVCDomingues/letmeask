@@ -9,7 +9,7 @@ import Button from '../components/Button';
 
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
-import { database, firebase } from '../services/firebase';
+import { database } from '../services/firebase';
 
 function Home() {
   const { signInWithGoogle, user } = useAuth();
