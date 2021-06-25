@@ -14,6 +14,7 @@ import { database, firebase } from '../services/firebase';
 function Home() {
   const { signInWithGoogle, user } = useAuth();
   const [roomCode, setRoomCode] = useState('');
+  const [hasClosedRoom, setHasClosedRoom] = useState(false);
 
   const history = useHistory();
 
@@ -40,7 +41,7 @@ function Home() {
     }
 
     if(roomRef.val().endedAt) {
-      alert('Room already closed.');
+      setHasClosedRoom(true);
       return;
     }
 
@@ -65,6 +66,11 @@ function Home() {
           <div className="separator">ou entre em uma sala</div>
           <form onSubmit={handleJoinRoom}>
             <input type="text" placeholder="Digite o código da sala" onChange={event => setRoomCode(event.target.value)} value={roomCode}/>
+            {hasClosedRoom && (
+              <div className="closed-room">
+                <span>Room has already been closed.</span>
+              </div>
+            )}
             <Button type="submit">Entrar na sala</Button>
           </form>
         </div>
